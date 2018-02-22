@@ -1,10 +1,10 @@
 //---------------------------------------------------------------------------------
 // Project: UART Echo using Bluetooth Demo
-// Authors: Hunter Hedges, Roger Canales, Matthew Hunter
+// Authors: Luis E. Lopez, Oscar Zuniga
 // Date: Feb 2018
 //
 // Description: In order to use the BlueSmirf, initialize UART3 and setup according to
-// pin layout. 'a' turns on blue LED, 'b', turns on red LED, 'c' turns on green LED.
+// pin layout. 'r' turns on RED LED, 'g', turns on GREEN LED, 'b' turns on BLUE LED.
 // By setting var UART_BASE = UART0_BASE, the code will work through USB connection
 //----------------------------------------------------------------------------------
 
@@ -22,7 +22,6 @@
 //------------------------------------------
 #include <stdint.h>
 #include <stdbool.h>
-//#include <uart_library.h>
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
@@ -32,7 +31,7 @@
 
 int main(void) {
 
-	uint32_t UART_BASE = UART3_BASE; // UART3_BASE Can be switched to UART0_BASE for usb connection
+	uint32_t UART_BASE = UART3_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
 
 	unsigned char charFromUART;
 
@@ -46,7 +45,7 @@ int main(void) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
-	UARTPutString(UART_BASE, "Beginning Program...\n\r");
+	UARTPutString(UART_BASE, "Connecting Established...\nPress r: to turn on Red LED\nPress g: to turn on Green LED\nPress b: to turn on Blue LED\nPress q: to turn off the LED\n\r");
 
 	while (1)
 	{
@@ -55,24 +54,20 @@ int main(void) {
 			charFromUART = UARTCharGet(UART_BASE);
 
 			switch(charFromUART) {
-				case 'a': // Turn on Blue LED
-					UARTPutString(UART_BASE, "\nCommand Received\n\r");
-					UARTPutString(UART_BASE, "Turning on Blue LED...\n\r");
-					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
-					break;
-				case 'b': // Turn on Red LED
-					UARTPutString(UART_BASE, "\nCommand Received\n\r");
-					UARTPutString(UART_BASE, "Turning on Red LED...\n\r");
+				case 'r': // Turn on Red LED
+					UARTPutString(UART_BASE, "Red LED selected\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 2);
 					break;
-				case 'c': // Turn on Green LED
-					UARTPutString(UART_BASE, "\nCommand Received\n\r");
-					UARTPutString(UART_BASE, "Turning on Green LED...\n\r");
+				case 'g': // Turn on Green LED
+					UARTPutString(UART_BASE, "Green LED selected\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 					break;
+				case 'b': // Turn on Blue LED
+					UARTPutString(UART_BASE, "Blue LED selected\n\r");
+					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
+					break;
 				case 'q': // Turn off LED
-					UARTPutString(UART_BASE, "\nCommand Received\n\r");
-					UARTPutString(UART_BASE, "Turning off LED...\n\r");
+					UARTPutString(UART_BASE, "Turning LED off\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
 				default:
 					UARTPutString(UART_BASE, "\nCommand Unknown\n\r");
