@@ -1,0 +1,51 @@
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Temporary editor files
+*~
+
+# macOS
+.DS_Store
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Eclipse artefacts
+.metadata
+RemoteSystemsTempFiles
+Debug
+
+# CCS Specific
+.ccsproject
+.cproject
+.launches/
+.project
+.settings/
+targetConfigs/
+tm4c1231h6pm.cmd
+tm4c1231h6pm_startup_ccs.c
