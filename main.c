@@ -45,7 +45,7 @@ int main(void) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
-	UARTPutString(UART_BASE, "Connection Established...\n\n\rPress r: to turn LED red\n\rPress g: to turn LED green\n\rPress b: to turn LED blue\n\rPress q: to turn LED off\n\r\n");
+	UARTPutString(UART_BASE, "Connection Established...\n\n\rPress r: to turn LED RED\n\rPress g: to turn LED GREEN\n\rPress b: to turn LED BLUE\n\rPress q: to turn LED OFF\n\r\n");
 
 	while (1)
 	{
