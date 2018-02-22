@@ -45,7 +45,7 @@ int main(void) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
-	UARTPutString(UART_BASE, "Connecting Established...\nPress r: to turn on Red LED\nPress g: to turn on Green LED\nPress b: to turn on Blue LED\nPress q: to turn off the LED\n\r");
+	UARTPutString(UART_BASE, "Connection Established...\n\n\rPress r: to turn LED RED\n\rPress g: to turn LED GREEN\n\rPress b: to turn LED BLUE\n\rPress q: to turn LED OFF\n\r\n");
 
 	while (1)
 	{
@@ -54,23 +54,24 @@ int main(void) {
 			charFromUART = UARTCharGet(UART_BASE);
 
 			switch(charFromUART) {
-				case 'r': // Turn on Red LED
-					UARTPutString(UART_BASE, "Red LED selected\n\r");
+				case 'r': // Turn LED RED
+					UARTPutString(UART_BASE, "Selection: turn LED RED\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 2);
 					break;
-				case 'g': // Turn on Green LED
-					UARTPutString(UART_BASE, "Green LED selected\n\r");
+				case 'g': // Turn LED GREEN
+					UARTPutString(UART_BASE, "Selection: turn LED GREEN\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 					break;
-				case 'b': // Turn on Blue LED
-					UARTPutString(UART_BASE, "Blue LED selected\n\r");
+				case 'b': // Turn LED BLUE
+					UARTPutString(UART_BASE, "Selection: turn LED BLUE\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
 					break;
-				case 'q': // Turn off LED
-					UARTPutString(UART_BASE, "Turning LED off\n\r");
+				case 'q': // Turn LED OFF
+					UARTPutString(UART_BASE, "Selection: turn LED OFF\n\r");
 					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
+					break;
 				default:
-					UARTPutString(UART_BASE, "\nCommand Unknown\n\r");
+					UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");
 					break;
 			}
 		}
