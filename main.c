@@ -32,7 +32,7 @@
 
 int main(void) {
 
-	uint32_t UART_BASE = UART3_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
+	uint32_t UART_BASE = UART0_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
 
 	unsigned char charFromUART;
 
