@@ -21,6 +21,7 @@
 // TivaWare Header Files
 //------------------------------------------
 #include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
@@ -45,36 +46,61 @@ int main(void) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
-	UARTPutString(UART_BASE, "Connection Established...\n\n\rPress r: to turn LED RED\n\rPress g: to turn LED GREEN\n\rPress b: to turn LED BLUE\n\rPress q: to turn LED OFF\n\r\n");
+	UARTPutString(UART_BASE, "Connection Established...\n\n\r");
+	UARTPutString(UART_BASE, "Select a status for the LED:\n\r");
+	UARTPutString(UART_BASE, "    red\n\r");
+	UARTPutString(UART_BASE, "    green\n\r");
+	UARTPutString(UART_BASE, "    blue\n\r");
+	UARTPutString(UART_BASE, "    off\n\r");
+	UARTPutString(UART_BASE, "Press ENTER after typing your selection\n\n\r");
 
+
+
+	int i;
+	char data[10];
 	while (1)
 	{
-		if(UARTCharsAvail(UART_BASE)) {
+		for (i = 0; i < 10; i++) {
+			data[i] = '\0';
+		}
+		i = 0;
 
-			charFromUART = UARTCharGet(UART_BASE);
 
-			switch(charFromUART) {
-				case 'r': // Turn LED RED
-					UARTPutString(UART_BASE, "Selection: turn LED RED\n\r");
-					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 2);
-					break;
-				case 'g': // Turn LED GREEN
-					UARTPutString(UART_BASE, "Selection: turn LED GREEN\n\r");
-					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
-					break;
-				case 'b': // Turn LED BLUE
-					UARTPutString(UART_BASE, "Selection: turn LED BLUE\n\r");
-					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
-					break;
-				case 'q': // Turn LED OFF
-					UARTPutString(UART_BASE, "Selection: turn LED OFF\n\r");
-					GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
-					break;
-				default:
-					UARTPutString(UART_BASE, "\nUnknown Command!!!\n\n\r");
-					break;
+		if (UARTCharsAvail(UART_BASE)) {
+		charFromUART = UARTCharGet(UART_BASE);
+
+
+
+			while ( charFromUART != '\r') {
+				data[i] = charFromUART;
+				charFromUART = UARTCharGet(UART_BASE);
+				i++;
+
+				if (i > 10)
+					UARTPutString(UART_BASE, "\rExceeded command length\n\r\r");
 			}
+
+
+		if (strcmp(data, "red") == 0) {
+			UARTPutString(UART_BASE, "Selection: turn LED RED\n\r");
+			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 2);
+		}
+		else if (strcmp(data, "green") == 0) {
+			UARTPutString(UART_BASE, "Selection: turn LED GREEN\n\r");
+			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
+		}
+		else if (strcmp(data, "blue") == 0) {
+			UARTPutString(UART_BASE, "Selection: turn LED BLUE\n\r");
+			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
+		}
+		else if (strcmp(data, "off") == 0) {
+			UARTPutString(UART_BASE, "Selection: turn LED OFF\n\r");
+			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
+		}
+		else {
+			UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");
 		}
 
+	}
 	}
 }
