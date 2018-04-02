@@ -51,3 +51,5 @@ tm4c1231h6pm.cmd
 tm4c1231h6pm_startup_ccs.c
 tm4c123ge6pm.cmd
 tm4c123ge6pm_startup_ccs.c
+tm4c123gh6pm.cmd
+tm4c123gh6pm_startup_ccs.c
