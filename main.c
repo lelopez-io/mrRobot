@@ -32,6 +32,7 @@
 #include "adc.h"
 #include "pwm_motors.h"
 #include "uart_library.h"
+#include "navigate.h"
 
 
 //#include "inc/hw_types.h"
@@ -84,8 +85,10 @@ int main(void) {
 	UARTPutString(UART_BASE, "    tl = LEFT TURN\n\r");
 	UARTPutString(UART_BASE, "    su = SPEED UP\n\r");
 	UARTPutString(UART_BASE, "    sd = SLOW DOWN\n\r");
-	UARTPutString(UART_BASE, "    off = STOP\n\r");
-	UARTPutString(UART_BASE, "Press ENTER after typing your selection\n\n\r");
+	UARTPutString(UART_BASE, "    off = STOP\n\n\r");
+	UARTPutString(UART_BASE, "Select a program to run:\n\r");
+	UARTPutString(UART_BASE, "    rl = Run Line\n\r");
+	UARTPutString(UART_BASE, "\nPress ENTER after typing your selection\n\n\r");
 
 
 
@@ -142,19 +145,20 @@ int main(void) {
 			}
 			else if (strcmp(data, "su") == 0) {
 				UARTPutString(UART_BASE, "Selection: speed UP\n\r");
-				//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 				pwmNow += 20;
 				motorsSPEED(pwmNow);
 			}
 			else if (strcmp(data, "sd") == 0) {
 				UARTPutString(UART_BASE, "Selection: speed DOWN\n\r");
-				//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 				pwmNow -= 20;
 				motorsSPEED(pwmNow);
 			}
 			else if (strcmp(data, "off") == 0) {
 				UARTPutString(UART_BASE, "Selection: OFF\n\r");
 				motorsOFF();
+			}
+			else if (strcmp(data, "rl") == 0) {
+				runLine();
 			}
 			else {
 				UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");

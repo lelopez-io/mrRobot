@@ -31,7 +31,10 @@ void Configure_PWM(){
 	//Enable peripherals
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1);
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+
+	// Configure PB0, PB1 Pins as Logic
+	GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
 	// Configure PD0, PD1 Pins as PWM
 	GPIOPinConfigure(GPIO_PD0_M1PWM0);
@@ -45,7 +48,7 @@ void Configure_PWM(){
 	PWMGenConfigure(PWM1_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
 	PWMGenConfigure(PWM1_BASE, PWM_GEN_1, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
 
-	//Set the Period (expressed in clock ticks)
+	//Set the Period
 	PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, period);
 	PWMGenPeriodSet(PWM1_BASE, PWM_GEN_1, period);
 
@@ -56,9 +59,6 @@ void Configure_PWM(){
 	// Enable the PWM generator
 	PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 	PWMGenEnable(PWM1_BASE, PWM_GEN_1);
-
-	// Turn on the output pins
-	//PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT |PWM_OUT_1_BIT, true);
 }
 
 void motorsOFF(){
@@ -66,36 +66,26 @@ void motorsOFF(){
 }
 
 void motorsFWD(){
-	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, false);
-
-	GPIOPinWrite(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1, true);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 0);
 	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
 }
 
 void motorsBACK(){
-	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, true);
-
-	GPIOPinWrite(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1, true);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 3);
 	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
 }
 
 void motorsRIGHT(){
-	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, false);
-	delayMS(2000);
-	PWMOutputState(PWM1_BASE, PWM_OUT_1_BIT, true);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 2);
+	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
 }
 
 void motorsLEFT(){
-	PWMOutputState(PWM1_BASE, PWM_OUT_1_BIT, false);
-	delayMS(2000);
-	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 1);
+	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
 }
 
-
-
 void motorsSPEED(unsigned long pwmNow){
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_5, pwmNow);
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_6, pwmNow);
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_4, pwmNow);
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_7, pwmNow);
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, pwmNow);
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, pwmNow);
 }

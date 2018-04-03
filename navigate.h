@@ -2,8 +2,8 @@
 #define _NAVIGATE_H_
 
 
-
-void navigateMaze();
+void configure_Navigate();
+void runLine();
 
 
 #endif
