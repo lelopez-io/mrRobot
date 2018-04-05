@@ -15,6 +15,8 @@
 #include "driverlib/pin_map.h"
 #include "uart_library.h"
 
+
+
 /*************************************************
  * Configure UART 0
  * BaudRate = 115200
@@ -65,6 +67,7 @@ void UARTPutString(uint32_t UART_BASE, unsigned char *stringToSend)
     	UARTCharPut(UART_BASE, *stringToSend++);
     }
 }
+
 
 /*************************************************
  * Get string from UART

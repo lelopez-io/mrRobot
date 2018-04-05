@@ -48,7 +48,10 @@ Debug
 .xdchelp
 .launches/
 .settings/
+.config/
+src/
 targetConfigs/
+
 tm4c1231h6pm.cmd
 tm4c1231h6pm_startup_ccs.c
 tm4c123ge6pm.cmd
@@ -62,5 +65,3 @@ EK_TM4C123GXL.cmd
 EK_TM4C123GXL.h
 empty_readme.txt
 makefile.defs
-mrRobot.cfg
-src/

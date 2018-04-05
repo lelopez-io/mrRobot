@@ -8,7 +8,7 @@
 #include "pwm_motors.h"
 
 
-	uint32_t speed = 150;
+uint32_t speed = 250;
 
 
 void delayMS(int ms) {
@@ -74,6 +74,9 @@ void motorsOFF(){
 }
 
 void motorsFWD(){
+	speed += 5;
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed);
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed);
 	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 0);
 	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
 }
@@ -94,12 +97,16 @@ void motorsLEFT(){
 }
 
 void motorsADDL(int32_t pwm) {
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed + pwm);
+	speed = 150;
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed); // RIGHT
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed += pwm);//LEFT
 
 }
 
 void motorsADDR(int32_t pwm) {
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed + pwm);
+	speed = 150;
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed); //LEFT
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed += pwm);//RIGHT
 
 }
 

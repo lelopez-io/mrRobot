@@ -31,21 +31,33 @@ void Configure_ADC(){
 	ADCSequenceEnable(ADC0_BASE, 2); //Side
 }
 
-uint32_t getVal_ADC() {
+uint32_t getVALF_ADC() {
 	//clear ADC interrupt flag
 	ADCIntClear(ADC0_BASE, 3); //Front
-	ADCIntClear(ADC0_BASE, 2); //Side
 
 	//trigger ADC conversion
 	ADCProcessorTrigger(ADC0_BASE, 3); //Front
-	ADCProcessorTrigger(ADC0_BASE, 2); //Side
 
 	//wait for the conversion to complete
 	while(!ADCIntStatus(ADC0_BASE, 3, false)) {} //Front
-	while(!ADCIntStatus(ADC0_BASE, 2, false)) {} //Side
 
 	// read the ADC value from the ADC Sample Sequencer 1 FIFO
 	ADCSequenceDataGet(ADC0_BASE, 3, ui32ADC0Value); //Front
+
+	return ui32ADC0Value[0];
+}
+
+uint32_t getVALS_ADC() {
+	//clear ADC interrupt flag
+	ADCIntClear(ADC0_BASE, 2); //Side
+
+	//trigger ADC conversion
+	ADCProcessorTrigger(ADC0_BASE, 2); //Side
+
+	//wait for the conversion to complete
+	while(!ADCIntStatus(ADC0_BASE, 2, false)) {} //Side
+
+	// read the ADC value from the ADC Sample Sequencer 1 FIFO
 	ADCSequenceDataGet(ADC0_BASE, 2, ui32ADC1Value); //Side
 
 	return ui32ADC1Value[0];

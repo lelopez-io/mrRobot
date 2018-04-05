@@ -15,10 +15,15 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/adc.h"
 
+
 #include "adc.h"
 #include "pwm_motors.h"
 #include "navigate.h"
 #include "uart_library.h"
+#include "Board.h"
+
+#define UART_BASE UART3_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
+
 
 
 /************[ Global Variables ]************************/
@@ -33,9 +38,9 @@ float Kp = 0.7;
 float Ki = 0.01;
 float Kd = 0.1;
 
-uint32_t UART_BASE = UART3_BASE;
+//uint32_t UART_BASE = UART3_BASE;
 
-void runLine() {
+void runADC() {
 	// UART3_BASE can be switched to UART0_BASE for USB connection
 	//uint32_t UART_BASE = UART3_BASE;
 
@@ -95,9 +100,10 @@ void runLine() {
 
 void runPID(void) {
 	//Initialize variables for PID control
-	startDistance = getVal_ADC();
-	prevError = 0;
-	I = 0;
+	//startDistance = getVALS_ADC();
+	//prevError = 0;
+	//I = 0;
+
 
 	//Start the motors
 	motorsFWD();
@@ -107,13 +113,13 @@ void runPID(void) {
 
 void PIDcontrol(void) {
 	//Read current distance (in ADC units)
-	currentDistance = getVal_ADC();
+	currentDistance = getVALS_ADC();
 	//Compare it to initial distance from the wall
 	error = startDistance - currentDistance;
 
 	//Calculate PID variables
 	P = Kp * error;
-	I = I * prevError;
+	I = error + prevError;
 	D = Kd * error - prevError;
 
 	pwm = P + (Ki * I) + D;

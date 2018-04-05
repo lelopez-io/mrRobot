@@ -70,6 +70,12 @@
 #include "uart_library.h"
 #include "navigate.h"
 
+
+
+
+
+#define UART_BASE UART3_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
+
 //Speed of motors
 unsigned long pwmNow = 150;
 
@@ -80,8 +86,10 @@ int main(void) {
 	//Set CPU Clock to 40MHz. 400MHz PLL/2 = 200 DIV 5 = 40MHz
 	SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
 
+
+
 	unsigned char charFromUART;
-	uint32_t UART_BASE = UART3_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
+	//uint32_t UART_BASE = UART3_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
 	Configure_UART0();
 	Configure_UART3();
 	UARTPutString(UART_BASE, "UART Configured...\n\n\r");
@@ -106,7 +114,8 @@ int main(void) {
 	UARTPutString(UART_BASE, "    sd = SLOW DOWN\n\r");
 	UARTPutString(UART_BASE, "    off = STOP\n\n\r");
 	UARTPutString(UART_BASE, "Select a program to run:\n\r");
-	UARTPutString(UART_BASE, "    rl = Run Line\n\r");
+	UARTPutString(UART_BASE, "    ra = Run ADC\n\r");
+    UARTPutString(UART_BASE, "    rp = Run PID\n\r");
 	UARTPutString(UART_BASE, "\nPress ENTER after typing your selection\n\n\r");
 
 
@@ -175,8 +184,8 @@ int main(void) {
 				UARTPutString(UART_BASE, "Selection: OFF\n\r");
 				motorsOFF();
 			}
-			else if (strcmp(data, "rl") == 0) {
-				runLine();
+			else if (strcmp(data, "ra") == 0) {
+				runADC();
 			}
 			else if (strcmp(data, "rp") == 0) {
 				runPID();
