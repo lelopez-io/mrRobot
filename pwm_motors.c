@@ -7,9 +7,17 @@
 #include "driverlib/pwm.h"
 #include "pwm_motors.h"
 
+
+	uint32_t speed = 150;
+
+
 void delayMS(int ms) {
     SysCtlDelay( (SysCtlClockGet()/(3*1000))*ms ) ;
 }
+
+//void adjustMotors(char direction) {
+//
+//}
 
 void Configure_PWM(){
 
@@ -85,7 +93,20 @@ void motorsLEFT(){
 	PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
 }
 
+void motorsADDL(int32_t pwm) {
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed + pwm);
+
+}
+
+void motorsADDR(int32_t pwm) {
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed + pwm);
+
+}
+
 void motorsSPEED(unsigned long pwmNow){
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, pwmNow);
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, pwmNow);
 }
+
+
+

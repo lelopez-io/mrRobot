@@ -17,6 +17,7 @@
 
 # Temporary editor files
 *~
+*.swp
 
 # macOS
 .DS_Store
@@ -43,8 +44,9 @@ Debug
 # CCS Specific
 .ccsproject
 .cproject
-.launches/
 .project
+.xdchelp
+.launches/
 .settings/
 targetConfigs/
 tm4c1231h6pm.cmd
@@ -53,3 +55,12 @@ tm4c123ge6pm.cmd
 tm4c123ge6pm_startup_ccs.c
 tm4c123gh6pm.cmd
 tm4c123gh6pm_startup_ccs.c
+
+Board.h
+EK_TM4C123GXL.c
+EK_TM4C123GXL.cmd
+EK_TM4C123GXL.h
+empty_readme.txt
+makefile.defs
+mrRobot.cfg
+src/

@@ -14,24 +14,39 @@ uint32_t ui32ADC1Value[1];
 void Configure_ADC(){
 
   
-  //enable ADC0 peripheral
+	//enable ADC0 peripheral
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0)) {}
 
 	//enable ADC0 sample, sequencer 3
-	ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
-	ADCSequenceConfigure(ADC0_BASE, 2, ADC_TRIGGER_PROCESSOR, 0);
+	ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0); //Front facing sensor
+	ADCSequenceConfigure(ADC0_BASE, 2, ADC_TRIGGER_PROCESSOR, 0); //Side facing sensor
 
-	//configure the interrupt flag and sample the AIN2 pin (PE1)
-	ADCSequenceStepConfigure(ADC0_BASE, 3, 0, (ADC_CTL_CH2|ADC_CTL_IE|ADC_CTL_END));
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 0, (ADC_CTL_CH1|ADC_CTL_IE|ADC_CTL_END));
+	//configure the interrupt flag and sample the AIN2 pin (PE1) and AIN3 pin (PE2)
+	ADCSequenceStepConfigure(ADC0_BASE, 3, 0, (ADC_CTL_CH2|ADC_CTL_IE|ADC_CTL_END)); //Front
+	ADCSequenceStepConfigure(ADC0_BASE, 2, 0, (ADC_CTL_CH1|ADC_CTL_IE|ADC_CTL_END)); //Side
 
-	//enable ADC sequencer 3
-	ADCSequenceEnable(ADC0_BASE, 3);
-	ADCSequenceEnable(ADC0_BASE, 2);
+	//enable ADC sequencer 3 and 2
+	ADCSequenceEnable(ADC0_BASE, 3); //Front
+	ADCSequenceEnable(ADC0_BASE, 2); //Side
 }
 
 uint32_t getVal_ADC() {
+	//clear ADC interrupt flag
+	ADCIntClear(ADC0_BASE, 3); //Front
+	ADCIntClear(ADC0_BASE, 2); //Side
 
-	return 0;
+	//trigger ADC conversion
+	ADCProcessorTrigger(ADC0_BASE, 3); //Front
+	ADCProcessorTrigger(ADC0_BASE, 2); //Side
+
+	//wait for the conversion to complete
+	while(!ADCIntStatus(ADC0_BASE, 3, false)) {} //Front
+	while(!ADCIntStatus(ADC0_BASE, 2, false)) {} //Side
+
+	// read the ADC value from the ADC Sample Sequencer 1 FIFO
+	ADCSequenceDataGet(ADC0_BASE, 3, ui32ADC0Value); //Front
+	ADCSequenceDataGet(ADC0_BASE, 2, ui32ADC1Value); //Side
+
+	return ui32ADC1Value[0];
 }

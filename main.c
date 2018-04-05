@@ -1,21 +1,57 @@
-//---------------------------------------------------------------------------------
-// Project: PWM using Bluetooth
-// Authors: Luis E. Lopez, Oscar Zuniga
-// Date: March 2018
-//
-// Description: In order to use the BlueSmirf, initialize UART3 and setup according to
-// pin layout. This program uses command to direct the motors (forward, backwards, left,
-// right, speed up, and speed down) with the help of the PWM functions of the tiva c.
-//----------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2015, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-
-//----------------------------------------
-// BIOS header files
-//----------------------------------------
+/*
+ *  ======== empty.c ========
+ */
+/* XDCtools Header files */
 #include <xdc/std.h>
+#include <xdc/runtime/System.h>
+
+/* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
-#include <xdc/runtime/Log.h>
-#include <xdc/cfg/global.h>
+#include <ti/sysbios/knl/Task.h>
+
+/* TI-RTOS Header files */
+#include <ti/drivers/GPIO.h>
+// #include <ti/drivers/I2C.h>
+// #include <ti/drivers/SDSPI.h>
+// #include <ti/drivers/SPI.h>
+// #include <ti/drivers/UART.h>
+// #include <ti/drivers/Watchdog.h>
+// #include <ti/drivers/WiFi.h>
+
+/* Board Header file */
+#include "Board.h"
 
 //------------------------------------------
 // TivaWare Header Files
@@ -34,23 +70,10 @@
 #include "uart_library.h"
 #include "navigate.h"
 
+//Speed of motors
+unsigned long pwmNow = 150;
 
-//#include "inc/hw_types.h"
-//#include "driverlib/pwm.h"
-//#include "driverlib/pin_map.h"
-
-/* PINS
- * Bluetooth:
- * 	Orange PC6
- * 	Yellow PC7
- *
- * Motors:
- * 	Blue PD0 & PD1
- *
- * */
-
-
-
+/*************[ Main ]************************************/
 
 int main(void) {
 
@@ -58,7 +81,7 @@ int main(void) {
 	SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
 
 	unsigned char charFromUART;
-	uint32_t UART_BASE = UART0_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
+	uint32_t UART_BASE = UART3_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
 	Configure_UART0();
 	Configure_UART3();
 	UARTPutString(UART_BASE, "UART Configured...\n\n\r");
@@ -70,11 +93,7 @@ int main(void) {
 
 	// Enables port, sets pins 1-3 (RGB) pins for output
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2);
-
-	// Enable Port E
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-
+	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
 
 	UARTPutString(UART_BASE, "Connection Established...\n\n\r");
@@ -95,8 +114,7 @@ int main(void) {
 	int i;
 	char data[10];
 
-	//Speed of motors
-	unsigned long pwmNow = 150;
+
 
 	while (1)
 	{
@@ -160,10 +178,17 @@ int main(void) {
 			else if (strcmp(data, "rl") == 0) {
 				runLine();
 			}
+			else if (strcmp(data, "rp") == 0) {
+				runPID();
+			}
 			else {
 				UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");
 			}
 
 		}
 	}
+
+
 }
+
+

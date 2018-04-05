@@ -1,3 +1,12 @@
+//----------------------------------------
+// BIOS header files
+//----------------------------------------
+#include <xdc/std.h>
+#include <ti/sysbios/BIOS.h>
+#include <xdc/runtime/Log.h>
+#include <xdc/cfg/global.h>
+
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
@@ -6,32 +15,29 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/adc.h"
 
+#include "adc.h"
+#include "pwm_motors.h"
 #include "navigate.h"
 #include "uart_library.h"
 
-void configure_Navigate(){
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
 
-	//enable ADC0 peripheral
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0)) {}
+/************[ Global Variables ]************************/
+uint32_t startDistance;
+uint32_t currentDistance;
+int32_t prevError;
+int32_t error;
+int32_t pwm, P, I, D;
+unsigned char* strPwm;
 
-	//enable ADC0 sample, sequencer 3
-	ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0); //Front facing sensor
-	ADCSequenceConfigure(ADC0_BASE, 2, ADC_TRIGGER_PROCESSOR, 0); //Side facing sensor
+float Kp = 0.7;
+float Ki = 0.01;
+float Kd = 0.1;
 
-	//configure the interrupt flag and sample the AIN2 pin (PE1) and AIN3 pin (PE2)
-	ADCSequenceStepConfigure(ADC0_BASE, 3, 0, (ADC_CTL_CH2|ADC_CTL_IE|ADC_CTL_END)); //Front
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 0, (ADC_CTL_CH1|ADC_CTL_IE|ADC_CTL_END)); //Side
-
-	//enable ADC sequencer 3 and 2
-	ADCSequenceEnable(ADC0_BASE, 3); //Front
-	ADCSequenceEnable(ADC0_BASE, 2); //Side
-}
+uint32_t UART_BASE = UART3_BASE;
 
 void runLine() {
 	// UART3_BASE can be switched to UART0_BASE for USB connection
-	uint32_t UART_BASE = UART0_BASE;
+	//uint32_t UART_BASE = UART3_BASE;
 
 	uint32_t ui32ADC0Value[1]; // storing the data read from ADC FIFO (Front sensor)
 	uint32_t ui32ADC1Value[1]; // storing the data read from ADC FIFO (Side sensor)
@@ -85,6 +91,75 @@ void runLine() {
 	} //End of while
 
 
+}
+
+void runPID(void) {
+	//Initialize variables for PID control
+	startDistance = getVal_ADC();
+	prevError = 0;
+	I = 0;
+
+	//Start the motors
+	motorsFWD();
+
+	BIOS_start();
+}
+
+void PIDcontrol(void) {
+	//Read current distance (in ADC units)
+	currentDistance = getVal_ADC();
+	//Compare it to initial distance from the wall
+	error = startDistance - currentDistance;
+
+	//Calculate PID variables
+	P = Kp * error;
+	I = I * prevError;
+	D = Kd * error - prevError;
+
+	pwm = P + (Ki * I) + D;
+
+
+	if (pwm > 0) { //Too far from the wall
+		//pwm = 255;
+		itoa(pwm, strPwm);
+		UARTPutString(UART_BASE, strPwm);
+		GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
+		motorsADDR(pwm);
+	}
+	else if ( pwm < 0) {//Too close to the wall
+		pwm = abs(pwm);
+		itoa(pwm, strPwm);
+		UARTPutString(UART_BASE, strPwm);
+		GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 2);
+		motorsADDL(pwm);
+	}
+	else {//Well centered
+		GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
+	}
+
+	//Save current error as previous error for the next interrupt
+	prevError = error;
+
+}
+
+unsigned char* itoa(int i, unsigned char b[]){
+    char const digit[] = "0123456789";
+    unsigned char* p = b;
+    if(i<0){
+        *p++ = '-';
+        i *= -1;
+    }
+    int shifter = i;
+    do{ //Move to where representation ends
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{ //Move back, inserting digits as u go
+        *--p = digit[i%10];
+        i = i/10;
+    }while(i);
+    return b;
 }
 
 
