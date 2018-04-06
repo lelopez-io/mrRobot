@@ -3,15 +3,15 @@
 
 void Configure_PWM();
 
-void motorsOFF();
+
 void motorsFWD();
+void motorsBACK();
 void motorsRIGHT();
 void motorsLEFT();
-void motorsBACK();
+void motorsOFF();
 void motorsSPEED(unsigned long pwmNow);
 void motorsADDR(int32_t pwm);
 void motorsADDL(int32_t pwm);
 
-void delayMS(int ms);
 
 #endif

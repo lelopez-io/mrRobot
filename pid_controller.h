@@ -8,10 +8,9 @@
 #ifndef PID_CONTROLLER_H_
 #define PID_CONTROLLER_H_
 
-//void PIDInit();
-//void PIDCompute();
-void printBIOS();
-void DWI();
+
+void funcBIOS();
+
 
 
 

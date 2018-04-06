@@ -10,15 +10,6 @@
 
 uint32_t speed = 250;
 
-
-void delayMS(int ms) {
-    SysCtlDelay( (SysCtlClockGet()/(3*1000))*ms ) ;
-}
-
-//void adjustMotors(char direction) {
-//
-//}
-
 void Configure_PWM(){
 
 	// PWM settings
@@ -48,9 +39,6 @@ void Configure_PWM(){
 	GPIOPinConfigure(GPIO_PD0_M1PWM0);
 	GPIOPinConfigure(GPIO_PD1_M1PWM1);
 	GPIOPinTypePWM(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-	//GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
 
 	// Configure PWM Options
 	PWMGenConfigure(PWM1_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
@@ -100,14 +88,12 @@ void motorsADDL(int32_t pwm) {
 	speed = 150;
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed); // RIGHT
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed += pwm);//LEFT
-
 }
 
 void motorsADDR(int32_t pwm) {
 	speed = 150;
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed); //LEFT
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed += pwm);//RIGHT
-
 }
 
 void motorsSPEED(unsigned long pwmNow){

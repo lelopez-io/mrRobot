@@ -70,39 +70,28 @@
 #include "uart_library.h"
 #include "navigate.h"
 
-
-
-
-
 #define UART_BASE UART3_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
 
-//Speed of motors
-unsigned long pwmNow = 150;
-
 /*************[ Main ]************************************/
-
 int main(void) {
 
 	//Set CPU Clock to 40MHz. 400MHz PLL/2 = 200 DIV 5 = 40MHz
 	SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
 
-
-
-	unsigned char charFromUART;
 	//uint32_t UART_BASE = UART3_BASE; // UART3_BASE can be switched to UART0_BASE for USB connection
 	Configure_UART0();
 	Configure_UART3();
-	UARTPutString(UART_BASE, "UART Configured...\n\n\r");
-
 
 	Configure_PWM();
-
 	Configure_ADC();
 
-	// Enables port, sets pins 1-3 (RGB) pins for output
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-	GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
+	//Speed of motors
+	unsigned long pwmNow = 150;
+
+	int i;
+	char data[10]; //Will store command from UART
+	unsigned char charFromUART;
 
 	UARTPutString(UART_BASE, "Connection Established...\n\n\r");
 	UARTPutString(UART_BASE, "Select a status for the Motor:\n\r");
@@ -118,86 +107,69 @@ int main(void) {
     UARTPutString(UART_BASE, "    rp = Run PID\n\r");
 	UARTPutString(UART_BASE, "\nPress ENTER after typing your selection\n\n\r");
 
-
-
-	int i;
-	char data[10];
-
-
-
-	while (1)
-	{
+	while(1) {
 		//Create an array for commands
 		for (i = 0; i < 10; i++) {
 			data[i] = '\0';
 		}
 
-
-
-		if (UARTCharsAvail(UART_BASE)) {
+		if(UARTCharsAvail(UART_BASE)) {
 			charFromUART = UARTCharGet(UART_BASE);
 
 			//Get command
 			i = 0;
-			while ( charFromUART != '\r') {
+			while(charFromUART != '\r') {
 				data[i] = charFromUART;
 				charFromUART = UARTCharGet(UART_BASE);
 				i++;
 
-				if (i > 10)
+				if (i > 10) {
 					UARTPutString(UART_BASE, "\rExceeded command length\n\r\r");
+				}
 			}
 
 			//Execute command
-			if (strcmp(data, "off") == 0) {
-				UARTPutString(UART_BASE, "Selection: motor OFF\n\r");
-				motorsOFF();
-
-			}
-			else if (strcmp(data, "fw") == 0) {
+			if(strcmp(data, "fw") == 0) {
 				UARTPutString(UART_BASE, "Selection: go FORWARD\n\r");
 				motorsFWD();
 			}
-			else if (strcmp(data, "bk") == 0) {
+			else if(strcmp(data, "bk") == 0) {
 				UARTPutString(UART_BASE, "Selection: turn BACK\n\r");
 				motorsBACK();
 			}
-			else if (strcmp(data, "tr") == 0) {
+			else if(strcmp(data, "tr") == 0) {
 				UARTPutString(UART_BASE, "Selection: turn RIGHT\n\r");
 				motorsRIGHT();
 			}
-			else if (strcmp(data, "tl") == 0) {
+			else if(strcmp(data, "tl") == 0) {
 				UARTPutString(UART_BASE, "Selection: turn LEFT\n\r");
 				motorsLEFT();
 			}
-			else if (strcmp(data, "su") == 0) {
+			else if(strcmp(data, "su") == 0) {
 				UARTPutString(UART_BASE, "Selection: speed UP\n\r");
 				pwmNow += 20;
 				motorsSPEED(pwmNow);
 			}
-			else if (strcmp(data, "sd") == 0) {
+			else if(strcmp(data, "sd") == 0) {
 				UARTPutString(UART_BASE, "Selection: speed DOWN\n\r");
 				pwmNow -= 20;
 				motorsSPEED(pwmNow);
 			}
-			else if (strcmp(data, "off") == 0) {
-				UARTPutString(UART_BASE, "Selection: OFF\n\r");
+			else if(strcmp(data, "off") == 0) {
+				UARTPutString(UART_BASE, "Selection: motors OFF\n\r");
 				motorsOFF();
 			}
-			else if (strcmp(data, "ra") == 0) {
+			else if(strcmp(data, "ra") == 0) {
 				runADC();
 			}
-			else if (strcmp(data, "rp") == 0) {
+			else if(strcmp(data, "rp") == 0) {
 				runPID();
 			}
 			else {
 				UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");
 			}
-
 		}
 	}
-
-
 }
 
 

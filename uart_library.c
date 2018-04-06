@@ -34,7 +34,6 @@ void Configure_UART0() {
 
 	UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 9600,
 			(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
-
 }
 
 /*************************************************
@@ -60,10 +59,8 @@ void Configure_UART3() {
  * Send string to UART
  *
  ************************************************/
-void UARTPutString(uint32_t UART_BASE, unsigned char *stringToSend)
-{
-    while(*stringToSend != 0)
-    {
+void UARTPutString(uint32_t UART_BASE, unsigned char *stringToSend) {
+    while(*stringToSend != 0) {
     	UARTCharPut(UART_BASE, *stringToSend++);
     }
 }
@@ -77,15 +74,13 @@ void UARTGetString(uint32_t UART_BASE, unsigned char *stringFromUART, unsigned l
 
 	unsigned long charcount = 0;
 
-	while (charcount <= ulCount) {
-
+	while(charcount <= ulCount) {
 		stringFromUART[charcount] = UARTCharGet(UART_BASE);
 
-		if ((stringFromUART[charcount] == '\r') || (stringFromUART[charcount] == '\n'))
+		if ((stringFromUART[charcount] == '\r') || (stringFromUART[charcount] == '\n'))  {
 			break;
-
+		}
 		charcount++;
 	}
-
 	stringFromUART[charcount] = 0;
 }
