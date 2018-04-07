@@ -62,7 +62,7 @@ void motorsOFF(){
 }
 
 void motorsFWD(){
-	speed += 5;
+	speed = 250;
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed);
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed);
 	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 0);

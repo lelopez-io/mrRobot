@@ -44,6 +44,7 @@ uint32_t frontSensor = 0;
 
 void funcBIOS() {
 	rightSensor = getVALS_ADC();
+	frontSensor = getVALF_ADC();
 
 	error = IDEAL_READING - rightSensor;
 
@@ -56,33 +57,58 @@ void funcBIOS() {
 
 /*========================[DEBUG]==============================*/
 	if(DEBUG) {
-		if (rightSensor > 900 && rightSensor <= 1500) {
-			UARTPutString(UART_BASE, "900 < V < 1500\n\n\r");
+		UARTPutString(UART_BASE, "*");
+
+		if(frontSensor > 900 && frontSensor <= 1500) {
+			UARTPutString(UART_BASE, "\t900 < V < 1500\t\t");
 		}
-		else if (rightSensor > 1500 && rightSensor <= 2200) {
-			UARTPutString(UART_BASE, "1500 < V < 2200\n\n\r");
+		else if(frontSensor > 1500 && frontSensor <= 2200) {
+			UARTPutString(UART_BASE, "\t1500 < V < 2200\t\t");
 		}
-		else if (rightSensor > 2200) {
-			UARTPutString(UART_BASE, "2200 < V \n\n\r");
+		else if(frontSensor > 2200) {
+			UARTPutString(UART_BASE, "\t2200 < V \t\t");
 		}
 		else {
-			UARTPutString(UART_BASE, "SIDE\n\n\r");
+			UARTPutString(UART_BASE, "\tFRONT\t\t\t");
+		}
+
+		if(rightSensor > 900 && rightSensor <= 1500) {
+			UARTPutString(UART_BASE, "900 < V < 1500\t\t");
+		}
+		else if(rightSensor > 1500 && rightSensor <= 2200) {
+			UARTPutString(UART_BASE, "1500 < V < 2200\t\t");
+		}
+		else if(rightSensor > 2200) {
+			UARTPutString(UART_BASE, "2200 < V \t\t");
+		}
+		else {
+			UARTPutString(UART_BASE, "SIDE\t\t\t");
 		}
 	}
 /*======================[DEBUG END]===========================*/
 
+	if(frontSensor > 2200) {
+		while(frontSensor > 900) {
+			motorsLEFT();
+			frontSensor = getVALF_ADC();
+		}
+		//motorsOFF();
+	}
+	motorsFWD();
 
-	if (rightSensor > 1500 && rightSensor <= 2200) {
-		UARTPutString(UART_BASE, "\t\tOK\n\n\r");
+	if(rightSensor > 1500 && rightSensor <= 2200) {
+		UARTPutString(UART_BASE, "OK\t\t");
 		motorsFWD();
 	} else if(error < 0) {
-		UARTPutString(UART_BASE, "\t\tNEGATIVE\n\n\r");
+		UARTPutString(UART_BASE, "NEGATIVE\t");
 		motorsADDR(schange);
 	} else if (error > 0) {
-		UARTPutString(UART_BASE, "\t\tPOSITIVE\n\n\r");
+		UARTPutString(UART_BASE, "POSITIVE\t");
 		motorsADDL(schange);
 	}
+	UARTPutString(UART_BASE, "*\n\n\r");
 }
+
 
 
 
