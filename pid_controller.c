@@ -42,6 +42,7 @@ int schange;
 uint32_t rightSensor = 0;
 uint32_t frontSensor = 0;
 
+//Runs with timer every 50ms
 void funcBIOS() {
 	rightSensor = getVALS_ADC();
 	frontSensor = getVALF_ADC();
@@ -87,6 +88,7 @@ void funcBIOS() {
 	}
 /*======================[DEBUG END]===========================*/
 
+	//U-Turn
 	if(frontSensor > 2200) {
 		while(frontSensor > 900) {
 			motorsLEFT();
@@ -96,6 +98,7 @@ void funcBIOS() {
 	}
 	motorsFWD();
 
+	//Follow the wall using PID
 	if(rightSensor > 1500 && rightSensor <= 2200) {
 		UARTPutString(UART_BASE, "OK\t\t");
 		motorsFWD();
