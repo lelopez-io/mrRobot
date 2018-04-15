@@ -16,7 +16,6 @@
 #include "uart_library.h"
 
 
-
 /*************************************************
  * Configure UART 0
  * BaudRate = 115200
@@ -63,6 +62,10 @@ void UARTPutString(uint32_t UART_BASE, unsigned char *stringToSend) {
     while(*stringToSend != 0) {
     	UARTCharPut(UART_BASE, *stringToSend++);
     }
+}
+
+void UARTPutInt(uint32_t UART_BASE, int number) {
+	UARTCharPut(UART_BASE, (char)number);
 }
 
 

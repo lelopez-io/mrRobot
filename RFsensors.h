@@ -10,6 +10,7 @@
 
 void delayMS(int ms);
 void reflectanceSensors();
+int findLine();
 int sensorsRead();
 
 

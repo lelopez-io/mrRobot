@@ -46,7 +46,7 @@
 // #include <ti/drivers/I2C.h>
 // #include <ti/drivers/SDSPI.h>
 // #include <ti/drivers/SPI.h>
-// #include <ti/drivers/UART.h>
+#include <ti/drivers/UART.h>
 // #include <ti/drivers/Watchdog.h>
 // #include <ti/drivers/WiFi.h>
 
@@ -56,6 +56,7 @@
 //------------------------------------------
 // TivaWare Header Files
 //------------------------------------------
+#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
@@ -74,6 +75,7 @@
 #define UART_BASE UART3_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
 
 /*************[ Main ]************************************/
+
 int main(void) {
 
 	//Set CPU Clock to 40MHz. 400MHz PLL/2 = 200 DIV 5 = 40MHz
