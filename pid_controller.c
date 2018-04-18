@@ -2,8 +2,11 @@
  * pid_controller.c
  *
  *  Created on: Apr 3, 2018
- *      Author: lelopez
+ *     Authors: lopez
+ *      		zuniga anzaldo
  */
+#include <ti/sysbios/BIOS.h>
+#include <xdc/cfg/global.h>
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -27,6 +30,10 @@
 #define UART_BASE UART3_BASE
 #define IDEAL_READING 1600
 
+int lineCounter = 0;
+bool passed1st = false;
+bool collect = true;
+
 int blackLine = 0;
 int tCounter = 0;
 int toggle = 0;
@@ -48,6 +55,8 @@ int schange;
 uint32_t rightSensor = 0;
 uint32_t frontSensor = 0;
 
+
+
 //Runs with timer every 50ms
 void funcBIOS() {
 	rightSensor = getVALS_ADC();
@@ -66,7 +75,7 @@ void funcBIOS() {
 	//Data Collection
 	blackLine += findLine();
 	toggle = !toggle;
-	if ((0 < blackLine) && (toggle)) {
+	if ((0 < blackLine) && (toggle) && collect) {
 		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 		if (tCounter < 20) {
 			bufferOne[tCounter] = error;
@@ -75,33 +84,26 @@ void funcBIOS() {
 		}
 		tCounter += 1;
 
-		//Write bufferOne
-		if (tCounter == 20) {
-			UARTPutString(UART_BASE, "bufferOne: \n\r");
-			for (i = 0; i < 20; i++) {
-				UARTPutInt(UART_BASE, bufferOne[i]);
-				//Toggle LED Green
-			}
-			UARTPutString(UART_BASE, "\n\n\r");
-			tCounter = 20;
-			for (i = 0; i < 20; i++) {
-				bufferTwo[i] = 0;
-			}
+		//Post a swi to print the buffers
+		Swi_post(SWI2);
+
+		//crossed the first line
+		if (lineCounter == 0) {
+			lineCounter++; //first line
 		}
-		//Write bufferTwo
-		if (tCounter == 40) {
-			UARTPutString(UART_BASE, "bufferTwo: \n\r");
-			for (i = 0; i < 20; i++) {
-				UARTPutInt(UART_BASE, bufferTwo[i]);
-				//Toggle LED Green
-			}
-			UARTPutString(UART_BASE, "\n\n\r");
-			tCounter = 0;
-			for (i = 0; i < 20; i++) {
-				bufferOne[i] = 0;
-			}
+
+		//second line, so stop
+		if ((passed1st) && (findLine())) {
+			motorsOFF();
+			collect = false;
+			GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
 		}
 	} //End of Data Collection
+
+		if((lineCounter == 1) && (!findLine())) {
+			//passed 1st line
+			passed1st = true;
+		}
 
 /*========================[DEBUG]==============================*/
 	if(DEBUG) {
@@ -141,7 +143,6 @@ void funcBIOS() {
 			motorsLEFT();
 			frontSensor = getVALF_ADC();
 		}
-		//motorsOFF();
 	}
 	motorsFWD();
 
@@ -159,6 +160,34 @@ void funcBIOS() {
 	//UARTPutString(UART_BASE, "*\n\n\r");
 }
 
+void printPingPong(void) {
+	//Write bufferOne
+	if (tCounter == 20) {
+		UARTPutString(UART_BASE, "bufferOne: \n\r");
+		for (i = 0; i < 20; i++) {
+			UARTPutInt(UART_BASE, bufferOne[i]);
+			//Toggle LED Green
+		}
+		UARTPutString(UART_BASE, "\n\n\r");
+		tCounter = 20;
+		for (i = 0; i < 20; i++) {
+			bufferTwo[i] = 0;
+		}
+	}
+	//Write bufferTwo
+	if (tCounter == 40) {
+		UARTPutString(UART_BASE, "bufferTwo: \n\r");
+		for (i = 0; i < 20; i++) {
+			UARTPutInt(UART_BASE, bufferTwo[i]);
+			//Toggle LED Green
+		}
+		UARTPutString(UART_BASE, "\n\n\r");
+		tCounter = 0;
+		for (i = 0; i < 20; i++) {
+			bufferOne[i] = 0;
+		}
+	}
+}
 
 
 
