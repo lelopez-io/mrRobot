@@ -74,7 +74,7 @@
 #include "navigate.h"
 #include "RFsensors.h"
 
-#define UART_BASE UART0_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
+#define UART_BASE UART3_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
 
 /*************[ Main ]************************************/
 

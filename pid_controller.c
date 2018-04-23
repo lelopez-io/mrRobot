@@ -35,7 +35,9 @@ bool passed1st = false;
 bool collect = true;
 
 int blackLine = 0;
-int tCounter = 0;
+int smallStrip = 0; 		//Collects data on every odd small strip 1, 3, 5
+int iCounter = 0; 			//Counts on every interrupt
+int tCounter = 0;			//Counts on toggle, when collect data
 int toggle = 0;
 int bufferOne[20] = { 0 };	//should be initialized
 int bufferTwo[20] = { 0 };	//should be initialized
@@ -59,6 +61,7 @@ uint32_t frontSensor = 0;
 
 //Runs with timer every 50ms
 void funcBIOS() {
+	iCounter++;
 	rightSensor = getVALS_ADC();
 	frontSensor = getVALF_ADC();
 
@@ -75,7 +78,21 @@ void funcBIOS() {
 	//Data Collection
 	blackLine += findLine();
 	toggle = !toggle;
-	if ((0 < blackLine) && (toggle) /*&& collect*/) {
+
+	if (iCounter == 5){
+		iCounter = 0;
+		if (blackLine == 1 ) {
+			smallStrip++;
+			blackLine = 0;
+			UARTPutString(UART_BASE, "Small Strip");
+
+		}
+		if (blackLine >= 2) {
+			SysCtlReset();
+		}
+	}
+
+	if ((toggle) && (smallStrip % 2)) {
 		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 		if (tCounter < 20) {
 			bufferOne[tCounter] = error;
@@ -85,25 +102,13 @@ void funcBIOS() {
 		tCounter += 1;
 
 		//Post a swi to print the buffers
-		//Swi_post(SWI2);
-
-		//crossed the first line
-		if (lineCounter == 0) {
-			lineCounter++; //first line
+		if ((tCounter == 20) || (tCounter == 40)){
+			//Swi_post(SWI2);
 		}
 
-		//second line, so stop
-		if ((passed1st) && (findLine())) {
-			motorsOFF();
-			collect = false;
-			GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
-		}
 	} //End of Data Collection
 
-		if((lineCounter == 1) && (!findLine())) {
-			//passed 1st line
-			passed1st = true;
-		}
+
 
 /*========================[DEBUG]==============================*/
 	if(DEBUG) {

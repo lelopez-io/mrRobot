@@ -18,7 +18,7 @@
 #include "uart_library.h"
 #include "RFsensors.h"
 
-#define UART_BASE UART0_BASE
+#define UART_BASE UART3_BASE
 #define LOW 0
 
 
@@ -52,12 +52,12 @@ int findLine() {
 
 	if ((reflectance > 500) && (reflectance < 10000)) {
 		//Black
-		UARTPutString(UART_BASE, "Black line\r\n\n");
+		//UARTPutString(UART_BASE, "Black line\r\n\n");
 		return 1;
 	}
 	else {
 		//White or TimeOut
-		UARTPutString(UART_BASE, "White\r\n\n");
+		//UARTPutString(UART_BASE, "White\r\n\n");
 		return 0;
 	}
 }
