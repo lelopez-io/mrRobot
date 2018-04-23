@@ -74,7 +74,7 @@
 #include "navigate.h"
 #include "RFsensors.h"
 
-#define UART_BASE UART3_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
+#define UART_BASE UART0_BASE // UART3_BASE can be switched to UART0_BASE for USB connection
 
 /*************[ Main ]************************************/
 
@@ -110,6 +110,7 @@ int main(void) {
 	UARTPutString(UART_BASE, "Select a program to run:\n\r");
 	UARTPutString(UART_BASE, "    ra = Run ADC\n\r");
     UARTPutString(UART_BASE, "    rp = Run PID\n\r");
+    UARTPutString(UART_BASE, "    rs = Reset\n\r");
 	UARTPutString(UART_BASE, "\nPress ENTER after typing your selection\n\n\r");
 
 	while(1) {
@@ -169,6 +170,9 @@ int main(void) {
 			}
 			else if(strcmp(data, "rp") == 0) {
 				runPID();
+			}
+			else if(strcmp(data, "rs") == 0) {
+				SysCtlReset();
 			}
 			else {
 				UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");

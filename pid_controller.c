@@ -41,7 +41,7 @@ int bufferOne[20] = { 0 };	//should be initialized
 int bufferTwo[20] = { 0 };	//should be initialized
 int i;
 
-uint32_t kp = 25;
+uint32_t kp = 37;
 uint32_t ki = 0.34;
 uint32_t kd = 0.34;
 
@@ -75,7 +75,7 @@ void funcBIOS() {
 	//Data Collection
 	blackLine += findLine();
 	toggle = !toggle;
-	if ((0 < blackLine) && (toggle) && collect) {
+	if ((0 < blackLine) && (toggle) /*&& collect*/) {
 		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 		if (tCounter < 20) {
 			bufferOne[tCounter] = error;
@@ -85,7 +85,7 @@ void funcBIOS() {
 		tCounter += 1;
 
 		//Post a swi to print the buffers
-		Swi_post(SWI2);
+		//Swi_post(SWI2);
 
 		//crossed the first line
 		if (lineCounter == 0) {
@@ -147,7 +147,7 @@ void funcBIOS() {
 	motorsFWD();
 
 	//Follow the wall using PID
-	if(rightSensor > 1500 && rightSensor <= 2200) {
+	if(rightSensor > 1600 && rightSensor <= 2100) {
 		//UARTPutString(UART_BASE, "OK\t\t");
 		motorsFWD();
 	} else if(error < 0) {
