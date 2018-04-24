@@ -85,7 +85,7 @@ void funcBIOS() {
 		if (blackLine == 1 ) {
 			smallStrip += 1;
 		}
-		if (blackLine == 2) {
+		if (blackLine >= 2) {
 
 
 			SysCtlReset();
