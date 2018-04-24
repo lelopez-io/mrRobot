@@ -52,7 +52,7 @@ int findLine() {
 
 	if ((reflectance > 500) && (reflectance < 10000)) {
 		//Black
-		//UARTPutString(UART_BASE, "Black line\r\n\n");
+		UARTPutString(UART_BASE, "\tBlack line\n\r");
 		return 1;
 	}
 	else {
