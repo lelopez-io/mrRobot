@@ -79,8 +79,8 @@ void funcBIOS() {
 	blackLine += findLine();
 	toggle = !toggle;
 
-	if (iCounter == 5){
-
+	if (iCounter == 6){
+		UARTPutString(UART_BASE, "Check\n\r");
 		iCounter = 0;
 		if (0 <blackLine < 2 ) {
 			smallStrip++;
@@ -141,6 +141,7 @@ void printPingPong(void) {
 		UARTPutString(UART_BASE, "Buffer 1:\n\r");
 		for (i = 0; i < 20; i++) {
 			UARTPutInt(UART_BASE, bufferOne[i]);
+			UARTPutString(UART_BASE, "\n\r");
 		}
 
 		tCounter = 20;
@@ -154,6 +155,7 @@ void printPingPong(void) {
 		UARTPutString(UART_BASE, "Buffer 2:\n\r");
 		for (i = 0; i < 20; i++) {
 			UARTPutInt(UART_BASE, bufferTwo[i]);
+			UARTPutString(UART_BASE, "\n\r");
 		}
 		tCounter = 0;
 		for (i = 0; i < 20; i++) {

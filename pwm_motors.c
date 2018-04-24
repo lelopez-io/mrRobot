@@ -80,7 +80,7 @@ void motorsRIGHT(){
 }
 
 void motorsLEFT(){
-	speed = 300;
+	speed = 250;
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed); // RIGHT
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed);//LEFT
 	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, 1);
@@ -88,13 +88,13 @@ void motorsLEFT(){
 }
 
 void motorsADDL(int32_t pwm) {
-	speed = 140;
+	speed = 150;
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed); // RIGHT
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed += pwm);//LEFT
 }
 
 void motorsADDR(int32_t pwm) {
-	speed = 140;
+	speed = 150;
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, speed); //LEFT
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, speed += pwm);//RIGHT
 }
