@@ -79,21 +79,21 @@ void funcBIOS() {
 	blackLine += findLine();
 	toggle = !toggle;
 
-	if (iCounter == 6){
+	if (iCounter == 3){
 		UARTPutString(UART_BASE, "Check\n\r");
 		iCounter = 0;
-		if (0 <blackLine < 2 ) {
-			smallStrip++;
+		if (blackLine == 1 ) {
+			smallStrip += 1;
 		}
 		if (blackLine == 2) {
 
 
 			SysCtlReset();
 		}
-		blackLine = 0;
+		blackLine = findLine();
 	}
 
-	if ((toggle) && (smallStrip % 2)) {
+	if ((toggle) && (smallStrip % 2 == 1)) {
 		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 		if (tCounter < 20) {
 			bufferOne[tCounter] = error;
@@ -107,6 +107,8 @@ void funcBIOS() {
 			Swi_post(SWI2);
 		}
 
+	} else if (smallStrip % 2 == 0) {
+		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
 	}
 
 	//End of Data Collection
