@@ -34,9 +34,9 @@ int lineCounter = 0;
 bool passed1st = false;
 bool collect = true;
 
+int prevBlackLine = 0;
 int blackLine = 0;
 int smallStrip = 0; 		//Collects data on every odd small strip 1, 3, 5
-int iCounter = 0; 			//Counts on every interrupt
 int tCounter = 0;			//Counts on toggle, when collect data
 int toggle = 0;
 int bufferOne[20] = { 0 };	//should be initialized
@@ -61,7 +61,6 @@ uint32_t frontSensor = 0;
 
 //Runs with timer every 50ms
 void funcBIOS() {
-	iCounter++;
 	rightSensor = getVALS_ADC();
 	frontSensor = getVALF_ADC();
 
@@ -76,22 +75,17 @@ void funcBIOS() {
 	prev_error = error;
 
 	//Data Collection
-	blackLine += findLine();
+	prevBlackLine = blackLine;
+	blackLine = findLine();
 	toggle = !toggle;
 
-	if (iCounter == 3){
-		UARTPutString(UART_BASE, "Check\n\r");
-		iCounter = 0;
-		if (blackLine == 1 ) {
-			smallStrip += 1;
-		}
-		if (blackLine >= 2) {
 
-
-			SysCtlReset();
-		}
-		blackLine = findLine();
+	if (prevBlackLine + blackLine >= 2) {
+		SysCtlReset();
+	} else if (prevBlackLine == 1) {
+		smallStrip += 1;
 	}
+
 
 	if ((toggle) && (smallStrip % 2 == 1)) {
 		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
