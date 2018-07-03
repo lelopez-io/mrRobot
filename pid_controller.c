@@ -34,8 +34,10 @@ int lineCounter = 0;
 bool passed1st = false;
 bool collect = true;
 
+int prevBlackLine = 0;
 int blackLine = 0;
-int tCounter = 0;
+int smallStrip = 0; 		//Collects data on every odd small strip 1, 3, 5
+int tCounter = 0;			//Counts on toggle, when collect data
 int toggle = 0;
 int bufferOne[20] = { 0 };	//should be initialized
 int bufferTwo[20] = { 0 };	//should be initialized
@@ -73,9 +75,19 @@ void funcBIOS() {
 	prev_error = error;
 
 	//Data Collection
-	blackLine += findLine();
+	prevBlackLine = blackLine;
+	blackLine = findLine();
 	toggle = !toggle;
-	if ((0 < blackLine) && (toggle) && collect) {
+
+
+	if (prevBlackLine + blackLine >= 2) {
+		SysCtlReset();
+	} else if (prevBlackLine == 1) {
+		smallStrip += 1;
+	}
+
+
+	if ((toggle) && (smallStrip % 2 == 1)) {
 		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
 		if (tCounter < 20) {
 			bufferOne[tCounter] = error;
@@ -85,57 +97,16 @@ void funcBIOS() {
 		tCounter += 1;
 
 		//Post a swi to print the buffers
-		Swi_post(SWI2);
-
-		//crossed the first line
-		if (lineCounter == 0) {
-			lineCounter++; //first line
+		if ((tCounter == 20) || (tCounter == 40)){
+			Swi_post(SWI2);
 		}
 
-		//second line, so stop
-		if ((passed1st) && (findLine())) {
-			motorsOFF();
-			collect = false;
-			GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
-		}
-	} //End of Data Collection
-
-		if((lineCounter == 1) && (!findLine())) {
-			//passed 1st line
-			passed1st = true;
-		}
-
-/*========================[DEBUG]==============================*/
-	if(DEBUG) {
-		UARTPutString(UART_BASE, "*");
-
-		if(frontSensor > 900 && frontSensor <= 1500) {
-			UARTPutString(UART_BASE, "\t900 < V < 1500\t\t");
-		}
-		else if(frontSensor > 1500 && frontSensor <= 2200) {
-			UARTPutString(UART_BASE, "\t1500 < V < 2200\t\t");
-		}
-		else if(frontSensor > 2200) {
-			UARTPutString(UART_BASE, "\t2200 < V \t\t");
-		}
-		else {
-			UARTPutString(UART_BASE, "\tFRONT\t\t\t");
-		}
-
-		if(rightSensor > 900 && rightSensor <= 1500) {
-			UARTPutString(UART_BASE, "900 < V < 1500\t\t");
-		}
-		else if(rightSensor > 1500 && rightSensor <= 2200) {
-			UARTPutString(UART_BASE, "1500 < V < 2200\t\t");
-		}
-		else if(rightSensor > 2200) {
-			UARTPutString(UART_BASE, "2200 < V \t\t");
-		}
-		else {
-			UARTPutString(UART_BASE, "SIDE\t\t\t");
-		}
+	} else if (smallStrip % 2 == 0) {
+		GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
 	}
-/*======================[DEBUG END]===========================*/
+
+	//End of Data Collection
+
 
 	//U-Turn
 	if(frontSensor > 2200) {
@@ -147,45 +118,46 @@ void funcBIOS() {
 	motorsFWD();
 
 	//Follow the wall using PID
-	if(rightSensor > 1500 && rightSensor <= 2200) {
-		//UARTPutString(UART_BASE, "OK\t\t");
+	if(rightSensor > 1600 && rightSensor <= 2100) {
 		motorsFWD();
 	} else if(error < 0) {
-		//UARTPutString(UART_BASE, "NEGATIVE\t");
+		if (rightSensor < 900) {
+			schange += 15;
+		}
 		motorsADDR(schange);
 	} else if (error > 0) {
-		//UARTPutString(UART_BASE, "POSITIVE\t");
 		motorsADDL(schange);
 	}
-	//UARTPutString(UART_BASE, "*\n\n\r");
 }
 
 void printPingPong(void) {
+	GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 4);
 	//Write bufferOne
 	if (tCounter == 20) {
-		UARTPutString(UART_BASE, "bufferOne: \n\r");
+		UARTPutString(UART_BASE, "Buffer 1:\n\r");
 		for (i = 0; i < 20; i++) {
 			UARTPutInt(UART_BASE, bufferOne[i]);
-			//Toggle LED Green
+			UARTPutString(UART_BASE, "\n\r");
 		}
-		UARTPutString(UART_BASE, "\n\n\r");
+
 		tCounter = 20;
 		for (i = 0; i < 20; i++) {
 			bufferTwo[i] = 0;
 		}
+		UARTPutString(UART_BASE, "\n\n\r");
 	}
 	//Write bufferTwo
 	if (tCounter == 40) {
-		UARTPutString(UART_BASE, "bufferTwo: \n\r");
+		UARTPutString(UART_BASE, "Buffer 2:\n\r");
 		for (i = 0; i < 20; i++) {
 			UARTPutInt(UART_BASE, bufferTwo[i]);
-			//Toggle LED Green
+			UARTPutString(UART_BASE, "\n\r");
 		}
-		UARTPutString(UART_BASE, "\n\n\r");
 		tCounter = 0;
 		for (i = 0; i < 20; i++) {
 			bufferOne[i] = 0;
 		}
+		UARTPutString(UART_BASE, "\n\n\r");
 	}
 }
 

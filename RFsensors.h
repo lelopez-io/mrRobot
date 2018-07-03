@@ -10,7 +10,8 @@
 
 void delayMS(int ms);
 int findLine();
-int sensorsRead();
+int sensorsRead1();
+int sensorsRead2();
 
 
 #endif /* RFSENSORS_H_ */

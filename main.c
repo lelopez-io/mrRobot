@@ -80,6 +80,7 @@
 
 int main(void) {
 
+
 	//Set CPU Clock to 40MHz. 400MHz PLL/2 = 200 DIV 5 = 40MHz
 	SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
 
@@ -110,6 +111,7 @@ int main(void) {
 	UARTPutString(UART_BASE, "Select a program to run:\n\r");
 	UARTPutString(UART_BASE, "    ra = Run ADC\n\r");
     UARTPutString(UART_BASE, "    rp = Run PID\n\r");
+    UARTPutString(UART_BASE, "    rs = Reset\n\r");
 	UARTPutString(UART_BASE, "\nPress ENTER after typing your selection\n\n\r");
 
 	while(1) {
@@ -169,6 +171,9 @@ int main(void) {
 			}
 			else if(strcmp(data, "rp") == 0) {
 				runPID();
+			}
+			else if(strcmp(data, "rs") == 0) {
+				SysCtlReset();
 			}
 			else {
 				UARTPutString(UART_BASE, "Unknown Command!!!\n\n\r");
